@@ -6,12 +6,18 @@ import {
 import { AuthContext } from "./authContext";
 import { useEffect, useContext } from "react";
 import { Platform } from "react-native";
+import { CLIENT_ID, REDIRECT_URI } from "@env";
 
 import * as WebBrowser from "expo-web-browser";
 
-// TO DO: MOVE THESE TO ENV
-const CLIENT_ID = "f7557db3ffb1415d9fce42bbca9cc634";
-const REDIRECT_URI = "exp://10.65.65.237:8081";
+// needed so that the browswer closes the modal after auth token
+WebBrowser.maybeCompleteAuthSession();
+
+// Endpoint
+const DISCOVERY = {
+  authorizationEndpoint: "https://accounts.spotify.com/authorize",
+  tokenEndpoint: "https://accounts.spotify.com/api/token",
+};
 const SCOPES = [
   "user-read-currently-playing",
   "user-read-recently-played",
@@ -22,15 +28,6 @@ const SCOPES = [
   "user-read-email",
   "user-read-private",
 ];
-
-// needed so that the browswer closes the modal after auth token
-WebBrowser.maybeCompleteAuthSession();
-
-// Endpoint
-const discovery = {
-  authorizationEndpoint: "https://accounts.spotify.com/authorize",
-  tokenEndpoint: "https://accounts.spotify.com/api/token",
-};
 
 const useSpotifyAuth = () => {
   const { token, setToken } = useContext(AuthContext);
@@ -52,7 +49,7 @@ const useSpotifyAuth = () => {
               // useProxy: true, // not needed afaict, default: false
             }),
     },
-    discovery
+    DISCOVERY
   );
 
   useEffect(() => {
