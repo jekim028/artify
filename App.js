@@ -1,30 +1,22 @@
-import "react-native-url-polyfill/auto";
-import { useState, useEffect } from "react";
-import { supabase } from "./lib/supabase";
-import Auth from "./components/Auth";
-import Account from "./components/Account";
-import { View } from "react-native";
+import { View, Text } from "react-native";
+import { AuthContext } from "./utils";
+import { useState } from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+
+import LoginScreen from "./screens/LoginScreen";
 
 export default function App() {
-  const [session, setSession] = useState(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-  }, []);
+  const [token, setToken] = useState(null);
+  const Stack = createStackNavigator();
 
   return (
-    <View>
-      {session && session.user ? (
-        <Account key={session.user.id} session={session} />
-      ) : (
-        <Auth />
-      )}
-    </View>
+    <AuthContext.Provider value={{ token, setToken }}>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="LoginScreen" component={LoginScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </AuthContext.Provider>
   );
 }
